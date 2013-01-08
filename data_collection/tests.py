@@ -6,11 +6,21 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
+from data_collection.script import TwitterSpider
+
+class TwitterDataTestCase(TestCase):
+	'''simple testcase to validate twitter api is worrking'''
+
+	def setUp(self):
+		pass
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+	def test_to_check_parsing(self):
+		username = 'mo_nearhan'
+		count = 10
+		self.TwitterSpider = TwitterSpider(username, count)
+		json = self.TwitterSpider.retrive_json()
+		self.assertTrue(json)
+		self.assertEquals(len(json), count)
+		
+
