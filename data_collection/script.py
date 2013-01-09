@@ -1,5 +1,5 @@
 import requests, re
-from data_collection.models import Observation
+from data_collection.models import Observation, UserProfile
 from datetime import datetime
 
 
@@ -12,7 +12,9 @@ class TwitterSpider(object):
 
 		self.twitter_api_url = ('https://api.twitter.com/1/statuses/user_timeline.json?'
 			'include_entities=true&include_rts=true&screen_name={username}&count={count}'.format(username=username, count=count))
-		self.username = username
+		
+		self.userProfile = UserProfile.get(twitter_name=username)
+		self.username = self.userProfile.twitter_name
 		self.tweet_count = count
 
 	def retrive_json(self):
