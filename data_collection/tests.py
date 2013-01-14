@@ -47,6 +47,8 @@ class TwitterDataTestCase(TestCase):
 		self.assertEquals(datetime(2013, 1, 8, 17, 59, 1), 
 			self.spider.convert_date(single_tweet))
 
+		self.assertEquals(288706389109510144, self.spider.get_tweet_id(single_tweet))
+		
 		# !! Not implemented as of yet
 		#self.assertEquals('headache, program', 
 		#	self.spider.parse_hash_tags(single_tweet))
@@ -54,6 +56,7 @@ class TwitterDataTestCase(TestCase):
 
 
 	def test_to_parse_all_tweets_in_response(self):
+
 		count = len(self.json_response)
 		created_observations = self.spider.parse_json_into_models(self.json_response)
 		self.assertEquals(count, len(created_observations))
@@ -62,8 +65,6 @@ class TwitterDataTestCase(TestCase):
 			print observation
 
 
-	def test_to_parse_only_new_tweets(self):
-		count = 2
 
 
 

@@ -35,3 +35,9 @@ class SignupModelForm(forms.ModelForm):
                 'first_name', 'last_name', 'groups')
 
 
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=30)
+    password = forms.CharField(max_length=30)
+
+

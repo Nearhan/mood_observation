@@ -10,12 +10,11 @@ class TwitterSpider(object):
 	''' an object that will retrieve twitter and process it '''
 
 
-	def __init__(self, username, count=20):
+	def __init__(self, username, count=200):
 
-		try:
-			self.user = User.objects.get(username=username)
-		except User.DoesNotExist:
-			print 'User Does Not Exist'
+
+		self.user = User.objects.get(username=username)
+
 
 		try:
 			self.userProfile = self.user.userprofile
@@ -27,7 +26,6 @@ class TwitterSpider(object):
 		self.tweet_count = count
 
 		self.twitter_api_url = self.get_twitter_api_url(self.twitter_username, self.tweet_count)
-
 
 
 
@@ -55,13 +53,17 @@ class TwitterSpider(object):
 			text = tweet.get('text')
 			mood_value = self.parse_mood_value(tweet)
 			date = self.convert_date(tweet)
+			tweet_id = self.get_tweet_id(tweet)
 			user = UserProfile.objects.get(twitter_username=self.twitter_username)
 
 			new_observation = Observation(tweet=text, 
-				mood_value=mood_value, date=date, user=user)
+				mood_value=mood_value, date=date, user=user, tweet_id=tweet_id)
 			created_objects.append(new_observation)
 		return created_objects
 
+
+	def get_tweet_id(self, tweet):
+		return tweet.get('id')
 
 	def save_all_observations(self, created_objects):
 		for obs in created_objects:
@@ -96,15 +98,32 @@ class TwitterSpider(object):
 		''' queries db for latests observation 
 		and constructs new json object to pass on new observation models'''
 
-		latest = Observation.objects.all().filter(user=self.userProfile).latest('id')
+		try:
+			latest = Observation.objects.get_latest(self.userProfile)
 
-		if not latest:
+		except Observation.DoesNotExist:
+			print 'No exsisting observations'
 			return json
 
-		else:
-			for index, tweet in enumerate(json):
-				if tweet.get('id') == latest.tweet_id:
-					return json[:index]
+		for index, tweet in enumerate(json):
+
+			if tweet.get('id') == latest.tweet_id:
+				return json[:index]
+						
+
+	def start(self):
+		''' convience wrapper for spider to retrive json and create objects'''
+
+		#retrive data
+		data = self.retrive_json()
+
+		#parse data into models
+		observations = self.parse_json_into_models(data)
+
+		#save all observations models to db
+		self.save_all_observations(observations)
+
+		return observations
 
 
 
