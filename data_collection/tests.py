@@ -11,9 +11,10 @@ import json
 
 class TwitterDataTestCase(TestCase):
 	'''simple testcase to validate twitter api is worrking'''
+	fixtures = ['inital.json']
 
 	def setUp(self):
-		username = 'mo_nearhan'
+		username = 'fsyed'
 		count = 10
 		self.spider = TwitterSpider(username, count)
 		with open('test_data.json', 'r') as f:
@@ -38,7 +39,6 @@ class TwitterDataTestCase(TestCase):
 	def test_to_parse_single_tweet(self):
 		single_tweet = self.json_response[0]
 
-		print single_tweet.get('text')
 		self.assertEquals("#-1 #headache writing this #program need a break", 
 			single_tweet.get('text'))
 
@@ -52,6 +52,7 @@ class TwitterDataTestCase(TestCase):
 		#	self.spider.parse_hash_tags(single_tweet))
 
 
+
 	def test_to_parse_all_tweets_in_response(self):
 		count = len(self.json_response)
 		created_observations = self.spider.parse_json_into_models(self.json_response)
@@ -59,6 +60,10 @@ class TwitterDataTestCase(TestCase):
 
 		for observation in created_observations:
 			print observation
+
+
+	def test_to_parse_only_new_tweets(self):
+		count = 2
 
 
 

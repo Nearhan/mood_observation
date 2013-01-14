@@ -1,0 +1,15 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/Nearhan/Desktop/mood_observation/mood_observation"
+		}
+	],
+
+	"settings": 
+
+		{
+			"python_executable": "/Users/Nearhan/.virtualenvs/mo/bin/python"
+    	}
+
+}

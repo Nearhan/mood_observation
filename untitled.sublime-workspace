@@ -1,0 +1,556 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"user",
+				"userProfile	(attribute, instance)"
+			],
+			[
+				"twi",
+				"twitter_username	(attribute, instance)"
+			],
+			[
+				"twitter",
+				"twitter_username"
+			],
+			[
+				"ge",
+				"get_twitter_api_url"
+			],
+			[
+				"User",
+				"UserProfile	(global, class)"
+			],
+			[
+				"tw",
+				"twitter_api_url	(attribute, instance)"
+			],
+			[
+				"top",
+				"top_arts	(global, function)"
+			],
+			[
+				"im",
+				"img_url"
+			],
+			[
+				"get",
+				"get_coords(ip)	(global, function)"
+			],
+			[
+				"url",
+				"urllib2"
+			],
+			[
+				"blog",
+				"blog_id	(local, instance)"
+			],
+			[
+				"j",
+				"jinja_env	(global, instance)"
+			],
+			[
+				"jj",
+				"jinja_env"
+			],
+			[
+				"render",
+				"render_front(title, art, error)	(attribute, function)"
+			],
+			[
+				"jinj",
+				"jinja_env	(global, instance)"
+			],
+			[
+				"val",
+				"validate_email(email)	(attribute, function)"
+			],
+			[
+				"post",
+				"post_values	(attribute, instance)"
+			],
+			[
+				"_",
+				"_writeForm(kwargs)	(attribute, function)"
+			],
+			[
+				"for",
+				"form_values"
+			],
+			[
+				"ass",
+				"assertEqual	(attribute, instance)"
+			],
+			[
+				"ro",
+				"rot13_index	(local, instance)"
+			],
+			[
+				"Cate",
+				"CategoryAdmin	(global, class)"
+			],
+			[
+				"fin",
+				"finalest	(local, instance)"
+			],
+			[
+				"cat",
+				"cat_slug_name	(local, instance)"
+			],
+			[
+				"backg",
+				"background-image"
+			],
+			[
+				"Form",
+				"FormView	(imported, instance)"
+			],
+			[
+				"Entry",
+				"EntryForm	(imported, instance)"
+			],
+			[
+				"form",
+				"formset_factory	(imported, instance)"
+			],
+			[
+				"Template",
+				"TemplateResponseMixin"
+			],
+			[
+				"Temp",
+				"TemplateResponseMixin"
+			],
+			[
+				"HomeP",
+				"HomePageFormView	(imported, instance)"
+			],
+			[
+				"htt",
+				"HttpResponse"
+			],
+			[
+				"uni",
+				"unittest"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "data_collection/script.py",
+			"settings":
+			{
+				"buffer_size": 2900,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\"\"\"\nThis file demonstrates writing tests using the unittest module. These will pass\nwhen you run \"manage.py test\".\n\nReplace this with more appropriate tests for your application.\n\"\"\"\n\nfrom django.test import TestCase\nfrom data_collection.script import *\nimport json\n\nclass TwitterDataTestCase(TestCase):\n	'''simple testcase to validate twitter api is worrking'''\n	fixtures = ['inital.json']\n\n	def setUp(self):\n		username = 'fsyed'\n		count = 10\n		self.spider = TwitterSpider(username, count)\n		with open('test_data.json', 'r') as f:\n			self.json_response = json.loads(f.read())\n\n	def test_to_check_url_is_formated_correctly(self):\n		url = self.spider.twitter_api_url\n		match = re.match(r'\\s', url)\n		self.assertFalse(match)\n\n	'''\n	def test_to_check_parsing(self):\n		data = self.spider.retrive_json()\n		self.assertTrue(data)\n\n	def test_to_return_error_when_no_tweets_found(self):\n		spider = TwitterSpider('no_nearhan', 10)\n		with self.assertRaises(TypeError):\n			spider.retrive_json()\n	'''\n\n	def test_to_parse_single_tweet(self):\n		single_tweet = self.json_response[0]\n\n		self.assertEquals(\"#-1 #headache writing this #program need a break\", \n			single_tweet.get('text'))\n\n		self.assertEquals(-1.0, self.spider.parse_mood_value(single_tweet))\n\n		self.assertEquals(datetime(2013, 1, 8, 17, 59, 1), \n			self.spider.convert_date(single_tweet))\n\n		# !! Not implemented as of yet\n		#self.assertEquals('headache, program', \n		#	self.spider.parse_hash_tags(single_tweet))\n\n\n\n	def test_to_parse_all_tweets_in_response(self):\n		count = len(self.json_response)\n		created_observations = self.spider.parse_json_into_models(self.json_response)\n		self.assertEquals(count, len(created_observations))\n\n		for observation in created_observations:\n			print observation\n\n\n	def test_to_parse_only_new_tweets(self):\n		count = 2\n		\n\n\n\n\n		\n\n",
+			"file": "data_collection/tests.py",
+			"file_size": 1812,
+			"file_write_time": 1358024356000000,
+			"settings":
+			{
+				"buffer_size": 1815,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "from django.db import models\nfrom django.contrib.auth.models import User\nfrom django.db.models.signals import post_save, pre_delete\nfrom django.dispatch import receiver\n\n# Create your models here.\n\n\nclass UserProfile(models.Model):\n	user = models.OneToOneField(User)\n	twitter_username = models.CharField(max_length=30, blank=True)\n\n	def __unicode__(self):\n		return 'User Profile of User {user}'.format(user=self.user)\n\n@receiver(post_save, sender=User)\ndef create_user_profile(sender, instance, created, **kwargs):\n	if created:\n		profile, created = UserProfile.objects.get_or_create(user=instance)\n\n@receiver(pre_delete, sender=User)\ndef delete_user_profile(sender, instance, **kwargs):\n	profile = UserProfile.objects.get(user=instance)\n	profile.delete()\n\n\nclass Observation(models.Model):\n	tweet = models.CharField(max_length=140)\n	mood_value = models.FloatField()\n	user = models.ForeignKey(UserProfile)\n	#hash_tags = models.CharField(max_length=140)\n	date = models.DateTimeField()\n	tweet_id = models.BigIntegerField()\n\n\n	def __unicode__(self):\n		return 'Observation: {tweet}'.format(tweet=self.tweet)\n\n\n\n\n\n",
+			"file": "data_collection/models.py",
+			"file_size": 1108,
+			"file_write_time": 1358025839000000,
+			"settings":
+			{
+				"buffer_size": 1108,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 13149,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "data_collection/fixtures/user.json",
+			"settings":
+			{
+				"buffer_size": 515,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Python/Python.sublime-build",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"packin",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: list",
+				"Package Control: List Packages"
+			],
+			[
+				"add",
+				"Project: Add Folder"
+			],
+			[
+				"pack ",
+				"Package Control: Install Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Package Control: Install Package"
+			],
+			[
+				"ad",
+				"Project: Add Folder"
+			],
+			[
+				"add f",
+				"Project: Add Folder"
+			],
+			[
+				"Snippet: ",
+				"Snippet: DecimalField (fdecimal)"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/User/Python Django.sublime-settings",
+		"/Users/Nearhan/Desktop/mood_observation/mood_observation/data_collection/models.py",
+		"/Users/Nearhan/Desktop/Udacity/cs253/asciichan/templates/front.html",
+		"/Users/Nearhan/Desktop/Udacity/cs253/username/username.py",
+		"/Users/Nearhan/Desktop/Udacity/cs253/asciichan/app.yaml",
+		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/username/untitled",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/app.yaml",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/username/form_tests.py",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/username/username.py",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/rot13.py",
+		"/Users/Nearhan/Desktop/Udacity/cs253/app.yaml",
+		"/Users/Nearhan/Desktop/Udacity/cs253/rot13.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/voting/models.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/settings.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/voting/forms.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/voting/views.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/voting/urls.py",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/voting/admin.py",
+		"/Users/Nearhan/Desktop/petworthys/templates/voting/voting.html",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/urls.py",
+		"/Users/Nearhan/Desktop/petworthys/templates/voting/thanks_for_voting.html",
+		"/Users/Nearhan/Desktop/petworthys/test.sublime-project",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/manage.py",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/assets/css/details.css",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/Details.html",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/assets/less/details.less",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/OneView Markup updated/Details.less",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/OneView Markup updated/Details.html",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/OneView Markup updated/OnviewLogin.html",
+		"/Users/Nearhan/Desktop/OneViewMarkUp/OneView Markup updated/Screens-BACKGROUND.jpg",
+		"/Users/Nearhan/Desktop/petworthys/templates/voting/categories2.html",
+		"/Users/Nearhan/Desktop/petworthys/templates/voting/categories.html",
+		"/Users/Nearhan/Desktop/OneView Markup updated/css/login.css",
+		"/Users/Nearhan/Desktop/OneView Markup updated/OnviewLogin.html",
+		"/Users/Nearhan/Desktop/petworthys/petworthys/__init__.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/form_test.html",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/login.html",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/base.html",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/simpleForum/urls.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/views.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/main.html",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/thread.html",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/posts.html",
+		"/Users/Nearhan/Learning/Ruby/test",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/models.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/forms.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/simpleForum/settings.py",
+		"/Users/Nearhan/Desktop/simpleForum/simpleForum/simpleForum/forum/templates/nav.html",
+		"/Users/Nearhan/Feastly/feastly/templates/meals/base.html",
+		"/Users/Nearhan/Feastly/feastly/templates/info/base.html",
+		"/Users/Nearhan/Desktop/DeltaAthensStats/__init__.py",
+		"/Users/Nearhan/Desktop/DeltaAthensStats/browser.py",
+		"/Users/Nearhan/Desktop/DeltaAthensStats/deltaathenstats.sublime-workspace",
+		"/Users/Nearhan/Desktop/haikuMachine/tests/api.py",
+		"/Users/Nearhan/Desktop/haikuMachine/db_tests/tests.py",
+		"/Users/Nearhan/Desktop/haikuMachine/db_tests/dbClass.py",
+		"/Users/Nearhan/Desktop/selenium/test_1.py",
+		"/Users/Nearhan/Desktop/selenium/stack.py",
+		"/Users/Nearhan/Desktop/haikuMachine/db_tests/api.py",
+		"/Users/Nearhan/Desktop/haikuMachine/db_tests/api_test.py",
+		"/Users/Nearhan/Learning/Python/projects/haiku/haiku.py",
+		"/Users/Nearhan/Learning/Python/projects/tic-tac-toe/test2.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"south"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "data_collection/script.py",
+					"settings":
+					{
+						"buffer_size": 2900,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2654,
+								2654
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1048.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "data_collection/tests.py",
+					"settings":
+					{
+						"buffer_size": 1815,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1806,
+								1806
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 430.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "data_collection/models.py",
+					"settings":
+					{
+						"buffer_size": 1108,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								754,
+								754
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 13149,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4210.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "data_collection/fixtures/user.json",
+					"settings":
+					{
+						"buffer_size": 515,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								513,
+								513
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 137.0,
+	"status_bar_visible": true
+}

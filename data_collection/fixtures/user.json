@@ -1,0 +1,20 @@
+[
+  {
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "fsyed", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": true, 
+      "is_staff": true, 
+      "last_login": "2013-01-09T20:37:12.975Z", 
+      "groups": [], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$jT22MVtgxhNd$RY6RCbegsC5uiLkfAR8zZNLBnhwGeVHnghDJlg9wsvc=", 
+      "email": "fsyed@gmail.com", 
+      "date_joined": "2013-01-09T20:37:12.975Z"
+    }
+  }
+]

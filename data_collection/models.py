@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 # Create your models here.
@@ -18,6 +18,11 @@ def create_user_profile(sender, instance, created, **kwargs):
 	if created:
 		profile, created = UserProfile.objects.get_or_create(user=instance)
 
+@receiver(pre_delete, sender=User)
+def delete_user_profile(sender, instance, **kwargs):
+	profile = UserProfile.objects.get(user=instance)
+	profile.delete()
+
 
 class Observation(models.Model):
 	tweet = models.CharField(max_length=140)
@@ -25,6 +30,7 @@ class Observation(models.Model):
 	user = models.ForeignKey(UserProfile)
 	#hash_tags = models.CharField(max_length=140)
 	date = models.DateTimeField()
+	tweet_id = models.BigIntegerField(default=1, blank=True)
 
 
 	def __unicode__(self):

@@ -1,6 +1,7 @@
 import requests, re
 from data_collection.models import Observation, UserProfile
 from datetime import datetime
+from django.contrib.auth.models import User
 
 
 #we will be importing other models evenutally
@@ -8,14 +9,34 @@ from datetime import datetime
 class TwitterSpider(object):
 	''' an object that will retrieve twitter and process it '''
 
+
 	def __init__(self, username, count=20):
 
-		self.twitter_api_url = ('https://api.twitter.com/1/statuses/user_timeline.json?'
-			'include_entities=true&include_rts=true&screen_name={username}&count={count}'.format(username=username, count=count))
-		
-		self.userProfile = UserProfile.get(twitter_name=username)
-		self.username = self.userProfile.twitter_name
+		try:
+			self.user = User.objects.get(username=username)
+		except User.DoesNotExist:
+			print 'User Does Not Exist'
+
+		try:
+			self.userProfile = self.user.userprofile
+		except UserProfile.DoesNotExist:
+			print 'set up a user profile'
+
+
+		self.twitter_username = self.userProfile.twitter_username
 		self.tweet_count = count
+
+		self.twitter_api_url = self.get_twitter_api_url(self.twitter_username, self.tweet_count)
+
+
+
+
+	def get_twitter_api_url(self, username, count):
+		url = ('https://api.twitter.com/1/statuses/user_timeline.json?'
+			'include_entities=true&include_rts=true&screen_name={username}&count={count}')
+		return url.format(username=username, count=count)
+
+
 
 	def retrive_json(self):
 		response = requests.get(self.twitter_api_url)
@@ -27,13 +48,17 @@ class TwitterSpider(object):
 
 	def parse_json_into_models(self, data):
 		created_objects = []
+
+		data = self.return_newest_tweets(data)
+
 		for tweet in data:
 			text = tweet.get('text')
 			mood_value = self.parse_mood_value(tweet)
 			date = self.convert_date(tweet)
+			user = UserProfile.objects.get(twitter_username=self.twitter_username)
 
 			new_observation = Observation(tweet=text, 
-				mood_value=mood_value, date=date, twitter_user=self.username)
+				mood_value=mood_value, date=date, user=user)
 			created_objects.append(new_observation)
 		return created_objects
 
@@ -67,11 +92,19 @@ class TwitterSpider(object):
 
 		return output
 
+	def return_newest_tweets(self, json):
+		''' queries db for latests observation 
+		and constructs new json object to pass on new observation models'''
 
+		latest = Observation.objects.all().filter(user=self.userProfile).latest('id')
 
+		if not latest:
+			return json
 
-
-
+		else:
+			for index, tweet in enumerate(json):
+				if tweet.get('id') == latest.tweet_id:
+					return json[:index]
 
 
 
