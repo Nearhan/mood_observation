@@ -137,55 +137,6 @@
 			]
 		]
 	},
-	"buffers":
-	[
-		{
-			"file": "data_collection/script.py",
-			"settings":
-			{
-				"buffer_size": 2900,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "\"\"\"\nThis file demonstrates writing tests using the unittest module. These will pass\nwhen you run \"manage.py test\".\n\nReplace this with more appropriate tests for your application.\n\"\"\"\n\nfrom django.test import TestCase\nfrom data_collection.script import *\nimport json\n\nclass TwitterDataTestCase(TestCase):\n	'''simple testcase to validate twitter api is worrking'''\n	fixtures = ['inital.json']\n\n	def setUp(self):\n		username = 'fsyed'\n		count = 10\n		self.spider = TwitterSpider(username, count)\n		with open('test_data.json', 'r') as f:\n			self.json_response = json.loads(f.read())\n\n	def test_to_check_url_is_formated_correctly(self):\n		url = self.spider.twitter_api_url\n		match = re.match(r'\\s', url)\n		self.assertFalse(match)\n\n	'''\n	def test_to_check_parsing(self):\n		data = self.spider.retrive_json()\n		self.assertTrue(data)\n\n	def test_to_return_error_when_no_tweets_found(self):\n		spider = TwitterSpider('no_nearhan', 10)\n		with self.assertRaises(TypeError):\n			spider.retrive_json()\n	'''\n\n	def test_to_parse_single_tweet(self):\n		single_tweet = self.json_response[0]\n\n		self.assertEquals(\"#-1 #headache writing this #program need a break\", \n			single_tweet.get('text'))\n\n		self.assertEquals(-1.0, self.spider.parse_mood_value(single_tweet))\n\n		self.assertEquals(datetime(2013, 1, 8, 17, 59, 1), \n			self.spider.convert_date(single_tweet))\n\n		# !! Not implemented as of yet\n		#self.assertEquals('headache, program', \n		#	self.spider.parse_hash_tags(single_tweet))\n\n\n\n	def test_to_parse_all_tweets_in_response(self):\n		count = len(self.json_response)\n		created_observations = self.spider.parse_json_into_models(self.json_response)\n		self.assertEquals(count, len(created_observations))\n\n		for observation in created_observations:\n			print observation\n\n\n	def test_to_parse_only_new_tweets(self):\n		count = 2\n		\n\n\n\n\n		\n\n",
-			"file": "data_collection/tests.py",
-			"file_size": 1812,
-			"file_write_time": 1358024356000000,
-			"settings":
-			{
-				"buffer_size": 1815,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "from django.db import models\nfrom django.contrib.auth.models import User\nfrom django.db.models.signals import post_save, pre_delete\nfrom django.dispatch import receiver\n\n# Create your models here.\n\n\nclass UserProfile(models.Model):\n	user = models.OneToOneField(User)\n	twitter_username = models.CharField(max_length=30, blank=True)\n\n	def __unicode__(self):\n		return 'User Profile of User {user}'.format(user=self.user)\n\n@receiver(post_save, sender=User)\ndef create_user_profile(sender, instance, created, **kwargs):\n	if created:\n		profile, created = UserProfile.objects.get_or_create(user=instance)\n\n@receiver(pre_delete, sender=User)\ndef delete_user_profile(sender, instance, **kwargs):\n	profile = UserProfile.objects.get(user=instance)\n	profile.delete()\n\n\nclass Observation(models.Model):\n	tweet = models.CharField(max_length=140)\n	mood_value = models.FloatField()\n	user = models.ForeignKey(UserProfile)\n	#hash_tags = models.CharField(max_length=140)\n	date = models.DateTimeField()\n	tweet_id = models.BigIntegerField()\n\n\n	def __unicode__(self):\n		return 'Observation: {tweet}'.format(tweet=self.tweet)\n\n\n\n\n\n",
-			"file": "data_collection/models.py",
-			"file_size": 1108,
-			"file_write_time": 1358025839000000,
-			"settings":
-			{
-				"buffer_size": 1108,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
-			"settings":
-			{
-				"buffer_size": 13149,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "data_collection/fixtures/user.json",
-			"settings":
-			{
-				"buffer_size": 515,
-				"line_ending": "Unix"
-			}
-		}
-	],
 	"build_system": "Packages/Python/Python.sublime-build",
 	"command_palette":
 	{
@@ -250,12 +201,15 @@
 	},
 	"file_history":
 	[
+		"/Users/Nearhan/Desktop/mood_observation/mood_observation/data_collection/script.py",
+		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/Nearhan/Desktop/mood_observation/mood_observation/untitled.sublime-workspace",
+		"/Users/Nearhan/Desktop/mood_observation/mood_observation/untitled.sublime-project",
 		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/User/Python Django.sublime-settings",
 		"/Users/Nearhan/Desktop/mood_observation/mood_observation/data_collection/models.py",
 		"/Users/Nearhan/Desktop/Udacity/cs253/asciichan/templates/front.html",
 		"/Users/Nearhan/Desktop/Udacity/cs253/username/username.py",
 		"/Users/Nearhan/Desktop/Udacity/cs253/asciichan/app.yaml",
-		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/username/untitled",
 		"/Users/Nearhan/Desktop/Udacity/cs253/rot13/app.yaml",
@@ -347,150 +301,6 @@
 		"whole_word": false,
 		"wrap": true
 	},
-	"groups":
-	[
-		{
-			"selected": 3,
-			"sheets":
-			[
-				{
-					"buffer": 0,
-					"file": "data_collection/script.py",
-					"settings":
-					{
-						"buffer_size": 2900,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2654,
-								2654
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1048.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "data_collection/tests.py",
-					"settings":
-					{
-						"buffer_size": 1815,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1806,
-								1806
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 430.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "data_collection/models.py",
-					"settings":
-					{
-						"buffer_size": 1108,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								754,
-								754
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/Users/Nearhan/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
-					"settings":
-					{
-						"buffer_size": 13149,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4210.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "data_collection/fixtures/user.json",
-					"settings":
-					{
-						"buffer_size": 515,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								513,
-								513
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
-			]
-		}
-	],
 	"incremental_find":
 	{
 		"height": 0.0
