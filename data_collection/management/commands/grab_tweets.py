@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
 		if observations:
 			for observation in observations:
-				self.stdout.write('New Tweet: {0) \n '.format(observation.tweet))
+				self.stdout.write('New Tweet: {0} \n '.format(observation.tweet))
 
 		else:
-			self.stdout.write('No knew tweets for {0} \n '.format(username))
+			self.stdout.write('No new tweets for {0} \n '.format(username))
