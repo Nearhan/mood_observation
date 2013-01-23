@@ -91,16 +91,9 @@ class DashBoardView(ListView):
 	    Get the list of items for this view. This must be an interable, and may
 	    be a queryset (in which qs-specific behavior will be enabled).
 	    """
-	    if self.queryset is not None:
-	        queryset = self.queryset
-	        if hasattr(queryset, '_clone'):
-	            queryset = queryset._clone()
-	    elif self.model is not None:
-	        queryset = self.model._default_manager.all().filter(user=self.request.user).order_by('-date')
-	    else:
-	        raise ImproperlyConfigured(u"'%s' must define 'queryset' or 'model'"
-	                                   % self.__class__.__name__)
-	    return queryset
+	    
+	    self.queryset = self.model._default_manager.all().filter(user=self.request.user).order_by('-date')
+	    return super(DashBoardView, self).get_queryset()
 
 
 
