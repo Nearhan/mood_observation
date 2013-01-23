@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'data_collection',
     'south',
     'data_visulization',
+    'django_extensions',
 )
 
 # A sample logging configuration. The only tangible logging
