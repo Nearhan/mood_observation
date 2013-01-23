@@ -61,7 +61,7 @@ class HomeRedirectView(View):
  	def get(self, request, *args, **kwargs):
  		pass
 
-
+'''
 class DashBoardView(TemplateView):
 
 	template_name= 'data_visulization/dashboard.html'
@@ -77,7 +77,6 @@ class DashBoardView(TemplateView):
 		kwargs['observations'] = observations
 		kwargs['s'] = 'this is a test string'
 		return kwargs
-
 
 '''
 class DashBoardView(ListView):
@@ -97,12 +96,12 @@ class DashBoardView(ListView):
 	        if hasattr(queryset, '_clone'):
 	            queryset = queryset._clone()
 	    elif self.model is not None:
-	        queryset = self.model._default_manager.all().filter(user=self.request.user)
+	        queryset = self.model._default_manager.all().filter(user=self.request.user).created_by('date')
 	    else:
 	        raise ImproperlyConfigured(u"'%s' must define 'queryset' or 'model'"
 	                                   % self.__class__.__name__)
 	    return queryset
-'''
+
 
 
 

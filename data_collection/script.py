@@ -82,7 +82,7 @@ class TwitterSpider(object):
 	def convert_date(self, tweet):
 		'''will return date in proper format'''
 		date_str = tweet.get('created_at')
-		return datetime.strptime(date_str, '%a %b %d %H:%M:%S +0000 %Y')
+		return datetime.strptime(date_str, '%a %b %d %H:%M:%S %Y')
 
 	def parse_hash_tags(self, tweet):
 		''' parse entities dict and reutrn a string of hash tags '''
