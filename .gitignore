@@ -1,4 +1,4 @@
 *.sublime-workspace
 *.sublime-project
 *.idea
-db/*
+db/main.db
