@@ -24,9 +24,7 @@ class SignupForm(forms.Form):
 
         if password != vpassword:
             raise forms.ValidationError('passwords do not match')
-
-
-
+            
 
 class SignupModelForm(forms.ModelForm):
     class Meta:

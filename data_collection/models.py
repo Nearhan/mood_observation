@@ -30,7 +30,7 @@ class ObservationManager(models.Manager):
 	def get_latest(self, user):
 		return self.filter(user=user).latest('date')
 		
-
+		
 class Observation(models.Model):
 	tweet = models.CharField(max_length=140)
 	mood_value = models.FloatField()
