@@ -1,6 +1,6 @@
 import requests, re
 from data_collection.models import Observation, UserProfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 
 
@@ -74,7 +74,9 @@ class TwitterSpider(object):
 		'''will return date in proper format'''
 		date_str = tweet.get('created_at')
 		date_str = date_str.replace('+0000', '')
-		return datetime.strptime(date_str, '%a %b %d %H:%M:%S %Y')
+		date = datetime.strptime(date_str, '%a %b %d %H:%M:%S %Y')
+		correct_date = date + timedelta(hours=-5)
+		return correct_date
 
 
 	def parse_hash_tags(self, tweet):
