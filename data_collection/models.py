@@ -14,7 +14,7 @@ class UserProfile(models.Model):
 		return 'User Profile of User {user}'.format(user=self.user)
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_profile(sender, instance, created, raw=True, **kwargs):
 	if created:
 		profile, created = UserProfile.objects.get_or_create(user=instance)
 

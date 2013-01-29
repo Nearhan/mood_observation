@@ -8,7 +8,9 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django.test.client import Client
 from data_visulization.forms import SignupForm
-from data_visulization.models import UserProifle
+from data_collection.models import Observation, UserProfile
+from data_visulization.utils import json_serilize_graph_data
+
 
 class TestSignUpView(TestCase):
 	''' Test the signup view '''
@@ -33,7 +35,7 @@ class TestSignUpView(TestCase):
 		self.assertTrue('passwords do not match' in response.content)
 
 
-	def test_to_check_user_is_created_after_form_submission(self):
+	'''def test_to_check_user_is_created_after_form_submission(self):
 		valid_data = {'username': 'asdf',
 						'password': 'asdf',
 						'verify_password': 'asdef',
@@ -41,7 +43,26 @@ class TestSignUpView(TestCase):
 
 		form = SignupForm(valid_data)
 
-		self.assertEquals(form.new_user, 'asdf')
+		self.assertEquals(form.username, 'asdf')
+	'''
+
+class TestJsonSerilizating(TestCase):
+	'''Test the Json Seralize Functions '''
+	fixtures = ['observation.json']
+
+	def test_to_check_json_creaion(self):
+		queryset = Observation.objects.all().filter(pk=1)
+		output = json_serilize_graph_data(queryset)
+		self.assertEquals(output, '[ { x: 1358984121.0, y: -1.0}]')
+
+
+
+
+
+
+
+
+
 
 
 
